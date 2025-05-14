@@ -2,12 +2,16 @@ version: '3.9'
 
 services:
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
     ports:
       - '3000:80'
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
     ports:
       - '8000:8000'
     depends_on:
@@ -15,7 +19,9 @@ services:
       - mongo
 
   engine:
-    build: .audio-processing
+    build:
+      context: ./audio-processing
+      dockerfile: Dockerfile.engine
     ports:
       - '5000:5000'
 
