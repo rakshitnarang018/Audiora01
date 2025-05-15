@@ -1,11 +1,18 @@
 package main
 
 import (
-    "fmt"
-    "github.com/gorilla/mux"
+	"log"
+	"net/http"
+
+	"backend/routes"
 )
 
 func main() {
-    r := mux.NewRouter()
-    fmt.Println("Router initialized:", r)
+	router := routes.SetupRouter()
+
+	log.Println("Server started at :8000")
+	err := http.ListenAndServe(":8000", router)
+	if err != nil {
+		log.Fatalf("Server failed to start: %v", err)
+	}
 }
