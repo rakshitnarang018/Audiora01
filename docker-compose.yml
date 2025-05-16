@@ -12,8 +12,11 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.backend
+    image: audiora01-backend
     ports:
-      - '8000:8000'
+      - "8000:8000"
+    volumes:
+      - ./temp:/app/temp
     depends_on:
       - engine
       - mongo
