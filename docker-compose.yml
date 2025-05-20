@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.8'  # Always good to specify version
 
 services:
   frontend:
@@ -14,12 +14,14 @@ services:
       dockerfile: Dockerfile.backend
     image: audiora01-backend
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
       - ./temp:/app/temp
     depends_on:
       - engine
-      - mongo
+      - mongo    
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
 
   engine:
     build:
@@ -27,9 +29,13 @@ services:
       dockerfile: Dockerfile.engine
     ports:
       - '5000:5000'
+    volumes:
+      - ./audio-processing/temp:/app/audio-processing/temp
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
 
   mongo:
-    image: mongo:6.0
+    image: mongo:6.0.23
     ports:
       - '27017:27017'
     volumes:

@@ -1,9 +1,9 @@
+import { toast } from "@/hooks/use-toast";
+
 export const uploadAudio = async (audioBlob: Blob): Promise<{ song?: string; error?: string }> => {
   try {
     const formData = new FormData();
     formData.append('audio', audioBlob, 'recording.wav');
-
-    console.log('FormData:', [...formData.entries()]);
 
     const response = await fetch('http://localhost:8000/upload-audio', {
       method: 'POST',
@@ -16,13 +16,19 @@ export const uploadAudio = async (audioBlob: Blob): Promise<{ song?: string; err
     }
 
     const data = await response.json();
-    console.log('Backend response:', data);
-    return data;
+    const songName = data?.match_result?.song_name;
+
+    if (songName) {
+      toast({ title: "Match Found!", description: `Song: ${songName}` });
+      return { song: songName };
+    } else {
+      toast({ title: "No Match Found", description: "Try uploading a clearer audio sample." });
+      return { error: "No match found" };
+    }
 
   } catch (error) {
-    console.error('Error uploading audio:', error);
-    return {
-      error: error instanceof Error ? error.message : 'Unknown error occurred while processing your audio',
-    };
+    const message = error instanceof Error ? error.message : 'Unknown error occurred while processing your audio';
+    toast({ title: "Error", description: message });
+    return { error: message };
   }
 };
