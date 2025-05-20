@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -6,16 +5,26 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Music, AlertTriangle } from 'lucide-react';
 
 interface LocationState {
-  song?: string;
+  match_result?: {
+    song_name?: string;
+  };
   error?: string;
 }
-
 const Result: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as LocationState || {};
-  
-  const { song, error } = state;
+  const state = (location.state || {}) as LocationState;
+
+  let songName: string | undefined;
+
+  if (typeof state.song === 'string') {
+    songName = state.song;
+  } else if (typeof state.song === 'object' && state.song !== null) {
+    // handle different possible keys for song title/name
+    songName = state.song.title || state.song.name || undefined;
+  }
+
+  const { error } = state;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative">
@@ -27,14 +36,14 @@ const Result: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 z-0"></div>
         
         <CardContent className="pt-6 relative z-10">
-          {song ? (
+          {songName ? (
             <div className="text-center">
               <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-song-purple to-song-deep-purple rounded-full flex items-center justify-center shadow-lg shadow-purple-300/30">
                 <Music className="w-10 h-10 text-white" />
               </div>
               <h2 className="text-2xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-song-purple to-song-deep-purple">Found a match!</h2>
               <div className="py-6 px-6 bg-purple-50/80 rounded-xl mb-4 mt-4 border border-purple-100">
-                <p className="text-xl font-semibold text-song-deep-purple">{song}</p>
+                <p className="text-xl font-semibold text-song-deep-purple">{songName}</p>
               </div>
             </div>
           ) : (

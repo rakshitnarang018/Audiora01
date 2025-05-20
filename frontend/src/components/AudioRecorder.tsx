@@ -1,4 +1,4 @@
-   import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecordButton from './RecordButton';
 import AudioWaveform from './AudioWaveform';
@@ -83,9 +83,11 @@ const AudioRecorder: React.FC = () => {
       }
 
       setIsRecording(false);
-      processRecording(blob);
+      await processRecording(blob);
     } catch (error) {
       console.error("Failed to stop recording:", error);
+      setIsRecording(false);
+      setIsProcessing(false);
     }
   };
 
