@@ -1,0 +1,128 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 260 15% 10%;
+    --foreground: 260 10% 95%;
+
+    --card: 260 15% 12%;
+    --card-foreground: 260 10% 95%;
+
+    --popover: 260 15% 10%;
+    --popover-foreground: 260 10% 95%;
+
+    --primary: 260 84% 64%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 260 20% 18%;
+    --secondary-foreground: 260 10% 95%;
+
+    --muted: 260 20% 18%;
+    --muted-foreground: 260 5% 65%;
+
+    --accent: 260 20% 18%;
+    --accent-foreground: 260 10% 95%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 260 20% 18%;
+    --input: 260 20% 18%;
+    --ring: 260 84% 64%;
+
+    --radius: 0.75rem;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-song-dark-bg via-[#181729] to-[#1D1827];
+    min-height: 100vh;
+    color: theme('colors.foreground');
+  }
+}
+
+@layer components {
+  .record-button {
+    @apply w-20 h-20 bg-gradient-to-br from-song-purple via-song-purple to-song-neon-purple rounded-full flex items-center justify-center text-white relative;
+    @apply hover:from-song-neon-purple hover:to-song-purple transition-all duration-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-song-purple focus:ring-offset-2 focus:ring-offset-song-dark-bg;
+    @apply shadow-[0_0_15px_rgba(156,92,246,0.6)];
+  }
+
+  .record-button::before {
+    content: '';
+    @apply absolute w-full h-full rounded-full;
+  }
+
+  .record-button.recording {
+    @apply from-destructive to-red-600;
+    animation: pulse-glow 1.5s infinite;
+  }
+
+  .record-button.recording::before {
+    @apply animate-pulse-ring bg-destructive/50;
+  }
+
+  .waveform-bar {
+    @apply bg-gradient-to-t from-song-purple to-song-neon-blue w-1 mx-0.5 rounded-full;
+    transform: scaleY(0.5);
+    animation: wave 1.2s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(156,92,246,0.7);
+  }
+
+  .glassmorphism {
+    @apply bg-white/10 backdrop-filter backdrop-blur-md border border-white/10 shadow-lg;
+  }
+  
+  .futuristic-card {
+    @apply bg-song-dark-card/70 backdrop-filter backdrop-blur-sm border border-song-dark-border/60 shadow-lg rounded-2xl;
+    box-shadow: 
+      0 10px 15px -3px rgba(0, 0, 0, 0.3),
+      0 4px 6px -4px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(156, 92, 246, 0.1) inset,
+      0 0 15px rgba(156, 92, 246, 0.15);
+  }
+  
+  .neon-border {
+    position: relative;
+  }
+  
+  .neon-border::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(45deg, #9C5CF6, #4FACFE, #00F2FE, #9C5CF6);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.7;
+    animation: animate-glow 3s linear infinite;
+  }
+  
+  @keyframes animate-glow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 5px rgba(220, 38, 38, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.8), 0 0 30px rgba(220, 38, 38, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(220, 38, 38, 0.5);
+  }
+}
+
+@keyframes wave {
+  0% { transform: scaleY(0.3); opacity: 0.6; }
+  50% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(0.3); opacity: 0.6; }
+}
