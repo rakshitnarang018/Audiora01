@@ -15,6 +15,7 @@ def load_hashes_from_json(json_path):
         except json.JSONDecodeError:
             sys.exit(1)
 
+# Matching audio file
 def match_audio_file(input_path):
     if input_path.endswith('.json'):
         query_hashes = load_hashes_from_json(input_path)

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import AudioRecorder from '../components/AudioRecorder';
-
+//  Landing Page
 const Index: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">

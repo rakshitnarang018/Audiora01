@@ -4,6 +4,7 @@ import time
 import os
 from utils import extract_spectrogram_fingerprints, get_audio_duration
 
+#Generating fingerprints
 def generate_json_fingerprint(audio_path, output_path="query.json"):
     if not os.path.isfile(audio_path):
         raise FileNotFoundError(f"File not found: {audio_path}")

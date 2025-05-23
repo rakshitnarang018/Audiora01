@@ -5,7 +5,7 @@ client = MongoClient(Mongo_URL)
 db = client.admin
 collection = db.fingerprints
 
-# Ensure indexes for fast lookup
+# Ensure indeices for fast lookup
 collection.create_index("song_name", unique=True)
 collection.create_index("fingerprints")
 

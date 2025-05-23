@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Music, AlertTriangle } from 'lucide-react';
 
+//  Result page
 interface LocationState {
   match_result?: {
     song_name?: string;
