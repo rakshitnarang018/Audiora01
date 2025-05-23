@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 const AudioWaveform: React.FC = () => {
   const [heights, setHeights] = useState<number[]>(Array.from({ length: 12 }, () => 8));
   
+  //  Designing
   // Create animation effect for waveform
   useEffect(() => {
     const interval = setInterval(() => {

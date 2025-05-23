@@ -34,6 +34,7 @@ def get_spectrogram_peaks(y, sr, n_fft=4096, hop_length=512, amp_min=-20, top_n_
                 peaks.append((t, f))
     return peaks
 
+#   Generate hashes
 def generate_hashes(peaks, fan_value=5):
     hashes = []
     for i in range(len(peaks)):

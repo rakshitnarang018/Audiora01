@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from 'lucide-react';
-
+//  Error Page
 const Error: React.FC = () => {
   const navigate = useNavigate();
 

@@ -5,7 +5,7 @@ from match_audio import match_audio_file
 
 app = Flask(__name__)
 
-# Absolute path setup
+# Absolute path setup.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "audio-processing", "temp")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
