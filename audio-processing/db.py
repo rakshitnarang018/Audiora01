@@ -1,8 +1,9 @@
+import os
 from pymongo import MongoClient
 
-Mongo_URL = "mongodb://mongo:27017"
-client = MongoClient(Mongo_URL)
-db = client.admin
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb://mongo:27017")
+client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+db = client.get_database(os.environ.get("MONGO_DB", "audiora"))
 collection = db.fingerprints
 
 # Ensure indeices for fast lookup

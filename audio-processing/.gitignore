@@ -1,0 +1,84 @@
+# # # Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# # # Virtual Environment
+# This is the 'env' folder in your screenshot. It should not be committed.
+/env/
+/venv/
+/.venv/
+
+# # # Temporary and Media Files
+# Ignoring the 'temp' directory and the 'sample_songs' directory.
+# Large media files should not be stored in a Git repository as they bloat its size.
+# It's better to store them elsewhere (like cloud storage) and provide a download script or instructions.
+/temp/
+/sample_songs/
+
+# Also ignore common audio and data file extensions that might be generated or used
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.ogg
+*.aiff
+*.csv
+*.dat
+
+# # # IDE and Editor directories
+# For VS Code, which you appear to be using
+.vscode/
+# For other common IDEs
+.idea/
+
+# # # Environment variables
+# Files for storing secrets and local configuration
+.env
+*.env
+
+# # # OS-generated files
+.DS_Store
+Thumbs.
+
+# Dependencies
+/node_modules/
+
+# Python Virtual Environments
+/env/
+/venv/
+/.venv/
+
+# Build output & compiled files
+/dist/
+/dist-ssr/
+/build/
+*.local
+__pycache__/
+*.pyc
+
+# Temporary files and media samples
+/temp/
+/sample_songs/
+*.mp3
+*.wav
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables & secrets
+.env
+.env.*
+*.env
+!.env.example
+
+# OS & Editor specific
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

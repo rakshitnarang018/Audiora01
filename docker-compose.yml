@@ -21,7 +21,7 @@ services:
       - engine
       - mongo    
     environment:
-      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_URI=${MONGO_URI}
 
   engine:
     build:
@@ -31,8 +31,10 @@ services:
       - '5000:5000'
     volumes:
       - ./audio-processing/temp:/app/audio-processing/temp
+      - ./audio-processing/temp:/app/audio-processing/add_sample_songs 
     environment:
-      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB=${MONGO_DB}
 
   mongo:
     image: mongo:6.0.23
