@@ -133,28 +133,20 @@ func processAudioAndGetResponse(filePath string) (*ProcessResponse, error) {
 	}
 	writer.Close()
 
-	// --- CHANGE STARTS HERE ---
-
-	// Get the engine URL from the environment variable. This is the crucial fix.
 	engineURL := os.Getenv("ENGINE_URL")
 	if engineURL == "" {
-		// Fallback to the Docker-specific URL for local development.
 		engineURL = "http://engine:5000"
 	}
 
-	// Construct the full request URL for the Python service's processing endpoint.
 	requestURL := engineURL + "/process"
 
-	// Use the dynamic requestURL instead of a hardcoded one.
 	req, err := http.NewRequest("POST", requestURL, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
-	// --- CHANGE ENDS HERE ---
-
-	client := &http.Client{Timeout: time.Second * 30} // Set a 30-second timeout
+	client := &http.Client{Timeout: 0}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to call processing API: %w", err)

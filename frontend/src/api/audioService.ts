@@ -2,7 +2,7 @@ import { toast } from "@/hooks/use-toast";
 
 // This line reads the VITE_API_URL you set in Vercel's project settings.
 // It ensures the app calls the deployed Render backend, not localhost.
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL||'http://localhost:8000';
 
 export const uploadAudio = async (audioBlob: Blob): Promise<{ song?: string; error?: string }> => {
   try {
