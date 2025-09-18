@@ -9,7 +9,13 @@ COPY . .
 
 RUN go build -o server
 
+# Final production stage
 FROM debian:bookworm-slim
+
+# --- THIS IS THE LINE YOU NEED TO ADD ---
+# Update package lists and install the root certificates for HTTPS
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+# ----------------------------------------
 
 WORKDIR /app
 
