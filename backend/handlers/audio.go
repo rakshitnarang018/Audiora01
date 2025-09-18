@@ -12,17 +12,18 @@ import (
 	"time"
 )
 
+// A map of allowed audio/video MIME types for the uploaded file.
 var allowedTypes = map[string]bool{
-	"audio/wav":      true,
-	"audio/wave":     true,
-	"audio/x-wav":    true,
-	"audio/x-pn-wav": true,
-	"audio/mp3":      true,
-	"audio/mpeg":     true,
-	"audio/webm":     true,
-	"video/webm":     true,
+	"audio/wav":   true,
+	"audio/wave":  true,
+	"audio/x-wav": true,
+	"audio/mp3":   true,
+	"audio/mpeg":  true,
+	"audio/webm":  true,
+	"video/webm":  true, // Often the format from browser recording
 }
 
+// Defines the structure of the JSON response from the Python engine.
 type ProcessResponse struct {
 	MatchResult *struct {
 		SongName string `json:"song_name"`
@@ -30,7 +31,9 @@ type ProcessResponse struct {
 	Error string `json:"error,omitempty"`
 }
 
+// Handles the multipart form audio upload from the frontend.
 func UploadAudioHandler(w http.ResponseWriter, r *http.Request) {
+	// Limit the request body size to 10 MB.
 	r.Body = http.MaxBytesReader(w, r.Body, 10<<20)
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
@@ -50,6 +53,7 @@ func UploadAudioHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Read the first 512 bytes to detect the content type.
 	buffer := make([]byte, 512)
 	if _, err := file.Read(buffer); err != nil {
 		http.Error(w, "Unable to read file for type detection", http.StatusInternalServerError)
@@ -57,6 +61,7 @@ func UploadAudioHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	contentType := http.DetectContentType(buffer)
 
+	// Reset the file reader back to the start.
 	if _, err := file.Seek(0, 0); err != nil {
 		http.Error(w, "Failed to reset file pointer", http.StatusInternalServerError)
 		return
@@ -67,25 +72,18 @@ func UploadAudioHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ext := filepath.Ext(fileHeader.Filename)
-	if ext == "" {
-		ext = ".webm"
-	}
-	filename := fmt.Sprintf("audio_%d%s", time.Now().UnixNano(), ext)
-
-	paths := []string{
-		"./temp",
-	}
-	for _, dir := range paths {
-		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-				http.Error(w, "Unable to create folder: "+err.Error(), http.StatusInternalServerError)
-				return
-			}
+	// Create a temporary directory to store the file if it doesn't exist.
+	tempDir := "./temp"
+	if _, err := os.Stat(tempDir); os.IsNotExist(err) {
+		if err := os.MkdirAll(tempDir, os.ModePerm); err != nil {
+			http.Error(w, "Unable to create temp folder: "+err.Error(), http.StatusInternalServerError)
+			return
 		}
 	}
 
-	destPath := filepath.Join("./temp", filename)
+	// Create a unique filename and save the file to the temp directory.
+	filename := fmt.Sprintf("audio_%d%s", time.Now().UnixNano(), filepath.Ext(fileHeader.Filename))
+	destPath := filepath.Join(tempDir, filename)
 	dst, err := os.Create(destPath)
 	if err != nil {
 		http.Error(w, "Unable to save the file: "+err.Error(), http.StatusInternalServerError)
@@ -98,21 +96,24 @@ func UploadAudioHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Process audio synchronously and return response to frontend
+	// Call the processing function to send the file to the Python engine.
 	responseData, err := processAudioAndGetResponse(destPath)
 	if err != nil {
 		http.Error(w, "Processing failed: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// Send the final result back to the frontend.
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(responseData)
 }
 
+// A simple health check handler.
 func PingHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("pong"))
 }
 
+// This function forwards the saved audio file to the Python processing engine.
 func processAudioAndGetResponse(filePath string) (*ProcessResponse, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -122,7 +123,6 @@ func processAudioAndGetResponse(filePath string) (*ProcessResponse, error) {
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-
 	part, err := writer.CreateFormFile("audio", filepath.Base(filePath))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create form file: %w", err)
@@ -131,18 +131,30 @@ func processAudioAndGetResponse(filePath string) (*ProcessResponse, error) {
 	if _, err := io.Copy(part, file); err != nil {
 		return nil, fmt.Errorf("failed to copy file into form: %w", err)
 	}
+	writer.Close()
 
-	if err := writer.Close(); err != nil {
-		return nil, fmt.Errorf("failed to close multipart writer: %w", err)
+	// --- CHANGE STARTS HERE ---
+
+	// Get the engine URL from the environment variable. This is the crucial fix.
+	engineURL := os.Getenv("ENGINE_URL")
+	if engineURL == "" {
+		// Fallback to the Docker-specific URL for local development.
+		engineURL = "http://engine:5000"
 	}
 
-	req, err := http.NewRequest("POST", "http://engine:5000/process", body)
+	// Construct the full request URL for the Python service's processing endpoint.
+	requestURL := engineURL + "/process"
+
+	// Use the dynamic requestURL instead of a hardcoded one.
+	req, err := http.NewRequest("POST", requestURL, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
-	client := &http.Client{}
+	// --- CHANGE ENDS HERE ---
+
+	client := &http.Client{Timeout: time.Second * 30} // Set a 30-second timeout
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to call processing API: %w", err)
@@ -155,7 +167,7 @@ func processAudioAndGetResponse(filePath string) (*ProcessResponse, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("processing API error: %s", string(respBody))
+		return nil, fmt.Errorf("processing API error (%d): %s", resp.StatusCode, string(respBody))
 	}
 
 	var result ProcessResponse
